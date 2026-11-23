@@ -1,0 +1,24 @@
+[[initiating-a-checkpoint]]
+== Initiating a Checkpoint
+
+NOTE: _To be written._ Describe the ways a checkpoint of a Jakarta EE runtime
+can be initiated.
+
+[[automatic-checkpoint]]
+=== Automatic Checkpoint
+
+NOTE: _To be written._ Define the automatic checkpoint: the point in the
+runtime's start-up at which it is taken, and how it is enabled and
+configured.
+
+[[manual-checkpoint]]
+=== Manual Checkpoint
+
+NOTE: _To be written._ Define the manual checkpoint, triggered from outside
+the Java Virtual Machine, for example with `jcmd`.
+
+[[checkpoint-preconditions]]
+=== Preconditions
+
+NOTE: _To be written._ Define the state the runtime and the deployed
+applications must be in before a checkpoint can be taken.

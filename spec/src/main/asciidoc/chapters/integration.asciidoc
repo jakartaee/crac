@@ -1,0 +1,30 @@
+[[integration]]
+== Integration with Other Specifications
+
+NOTE: _To be written._ Describe the expected behavior of other Jakarta EE
+technologies at checkpoint and restore.
+
+[[integration-concurrency]]
+=== Jakarta Concurrency
+
+NOTE: _To be written._ Managed executors, scheduled tasks, and threads.
+
+[[integration-persistence]]
+=== Jakarta Persistence and Data Sources
+
+NOTE: _To be written._ Connection pools and entity manager factories.
+
+[[integration-messaging]]
+=== Jakarta Messaging
+
+NOTE: _To be written._ Connections and sessions to messaging providers.
+
+[[integration-servlet]]
+=== Jakarta Servlet
+
+NOTE: _To be written._ Listening sockets and in-flight requests.
+
+[[integration-enterprise-beans]]
+=== Jakarta Enterprise Beans
+
+NOTE: _To be written._ Timers and their schedules.

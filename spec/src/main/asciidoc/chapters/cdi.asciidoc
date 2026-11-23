@@ -1,0 +1,23 @@
+[[cdi-integration]]
+== CDI Integration
+
+NOTE: _To be written._ Describe how checkpoint and restore are exposed to
+CDI beans.
+
+[[cdi-events]]
+=== Events
+
+NOTE: _To be written._ Define the CDI events fired before a checkpoint and
+after a restore, their payload, and their observer ordering.
+
+[[cdi-annotations]]
+=== Annotations
+
+NOTE: _To be written._ Define the annotations applications use to take part
+in checkpoint and restore.
+
+[[cdi-scopes]]
+=== Contexts and Scopes
+
+NOTE: _To be written._ Define how bean instances in each built-in scope are
+treated across checkpoint and restore.

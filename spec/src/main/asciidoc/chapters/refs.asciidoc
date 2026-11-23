@@ -1,0 +1,34 @@
+:numbered!:
+["bibliography",sectnum="0"]
+
+[[bibliography]]
+
+== Bibliography
+
+[[ref-javase21]]
+* *Java SE 21*,
+  https://docs.oracle.com/en/java/javase/21/
+
+[[ref-jakartaee11]]
+* *Jakarta EE Platform 11*,
+  https://jakarta.ee/specifications/platform/11/
+
+[[ref-cdi]]
+* *Jakarta Contexts and Dependency Injection 4.1*,
+  https://jakarta.ee/specifications/cdi/4.1/
+
+[[ref-crac-project]]
+* *OpenJDK Project CRaC*,
+  https://openjdk.org/projects/crac/
+
+[[ref-org-crac]]
+* *CRaC API (`org.crac`)*,
+  https://github.com/CRaC/org.crac
+
+[[ref-openj9-criu]]
+* *Eclipse OpenJ9 CRIU support*,
+  https://eclipse.dev/openj9/docs/criusupport/
+
+[[ref-rfc2119]]
+* *RFC 2119: Key words for use in RFCs to Indicate Requirement Levels*,
+  https://www.rfc-editor.org/rfc/rfc2119

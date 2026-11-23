@@ -74,10 +74,25 @@ pipeline {
                     if (!(params.DEVELOPMENT_VERSION ==~ /^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9]+(\.[A-Za-z0-9]+)*)?$/)) {
                         throw new IllegalArgumentException("Invalid DEVELOPMENT_VERSION '${params.DEVELOPMENT_VERSION}', expected e.g. 1.0.1-SNAPSHOT.")
                     }
+                    // The EE4J stage-release profile skips deploying snapshots, so a snapshot release
+                    // version would tag and publish a release without staging any artifacts.
+                    if (params.RELEASE_VERSION.endsWith('-SNAPSHOT')) {
+                        throw new IllegalArgumentException("RELEASE_VERSION '${params.RELEASE_VERSION}' must not be a -SNAPSHOT version.")
+                    }
+                    // The snapshot-publish job only deploys -SNAPSHOT versions.
+                    if (!params.DEVELOPMENT_VERSION.endsWith('-SNAPSHOT')) {
+                        throw new IllegalArgumentException("DEVELOPMENT_VERSION '${params.DEVELOPMENT_VERSION}' must end in -SNAPSHOT.")
+                    }
                     if (!(params.SPEC_STATUS in ['Draft', 'Final Release'])) {
                         throw new IllegalArgumentException("Invalid SPEC_STATUS '${params.SPEC_STATUS}', expected 'Draft' or 'Final Release'.")
                     }
                     echo "Staging release for version ${params.RELEASE_VERSION}"
+
+                    // GIT_BRANCH is "main" in multibranch jobs but "origin/main" in plain pipeline jobs.
+                    def targetBranch = env.GIT_BRANCH.replaceFirst(/^origin\//, '')
+                    if (!(targetBranch ==~ /^[A-Za-z0-9._\/-]+$/)) {
+                        throw new IllegalStateException("Unexpected GIT_BRANCH '${env.GIT_BRANCH}'.")
+                    }
 
                     // GitHub's published SSH host keys (https://api.github.com/meta), so pushes
                     // verify that they talk to github.com.
@@ -117,7 +132,7 @@ github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+V
                                 sh "mvn versions:set -DnewVersion=${params.DEVELOPMENT_VERSION} -DgenerateBackupPoms=false"
 
                                 sh "git commit -a -m '[Jenkins staging job] Preparing next development iteration'"
-                                sh "git push origin HEAD:${env.GIT_BRANCH}"
+                                sh "git push origin HEAD:refs/heads/${targetBranch}"
                                 sh "git push --force origin refs/tags/${params.RELEASE_VERSION}"
                                 }
                             }
@@ -219,6 +234,15 @@ PY
                             [ "$STATUS" = "200" ] || fail "could not look up existing release ${RELEASE_VERSION}" "$STATUS"
                             RELEASE_ID="$(python3 -c "import json,sys;print(json.load(open(sys.argv[1]))['id'])" "$BODY")"
                             echo "Reusing GitHub Release ${RELEASE_VERSION} (id=${RELEASE_ID})"
+
+                            # Bring the reused release in line with the requested SPEC_STATUS,
+                            # e.g. when a Draft release is re-staged as a Final Release.
+                            python3 - > release-update.json <<'PY'
+import json, os
+print(json.dumps({'prerelease': os.environ['PRERELEASE'] == 'true'}))
+PY
+                            STATUS="$(gh_api PATCH "$API/releases/${RELEASE_ID}" release-update.json)"
+                            [ "$STATUS" = "200" ] || fail "could not update release ${RELEASE_VERSION}" "$STATUS"
                         else
                             fail "could not create release ${RELEASE_VERSION}" "$STATUS"
                         fi

@@ -66,7 +66,26 @@ pipeline {
                     if (!params.SPEC_STATUS) {
                         throw new IllegalArgumentException("Missing value for parameter SPEC_STATUS. Use 'Final Release' for a final release.")
                     }
+                    // The parameters are interpolated into shell commands run with credentials,
+                    // so accept only well-formed values.
+                    if (!(params.RELEASE_VERSION ==~ /^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9]+(\.[A-Za-z0-9]+)*)?$/)) {
+                        throw new IllegalArgumentException("Invalid RELEASE_VERSION '${params.RELEASE_VERSION}', expected e.g. 1.0.0 or 1.0.0-M1.")
+                    }
+                    if (!(params.DEVELOPMENT_VERSION ==~ /^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9]+(\.[A-Za-z0-9]+)*)?$/)) {
+                        throw new IllegalArgumentException("Invalid DEVELOPMENT_VERSION '${params.DEVELOPMENT_VERSION}', expected e.g. 1.0.1-SNAPSHOT.")
+                    }
+                    if (!(params.SPEC_STATUS in ['Draft', 'Final Release'])) {
+                        throw new IllegalArgumentException("Invalid SPEC_STATUS '${params.SPEC_STATUS}', expected 'Draft' or 'Final Release'.")
+                    }
                     echo "Staging release for version ${params.RELEASE_VERSION}"
+
+                    // GitHub's published SSH host keys (https://api.github.com/meta), so pushes
+                    // verify that they talk to github.com.
+                    def knownHosts = "${env.WORKSPACE_TMP}/github_known_hosts"
+                    writeFile file: knownHosts, text: '''github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
+github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
+'''
 
                     sshagent(['github-bot-ssh']) {
                         withCredentials([
@@ -74,14 +93,14 @@ pipeline {
                             string(credentialsId: 'gpg-passphrase', variable: 'MAVEN_GPG_PASSPHRASE')
                         ]) {
                             withMaven(mavenLocalRepo: env.WORKSPACE_TMP + '/.m2repository') {
-                                withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"]) {
+                                withEnv(["GIT_SSH_COMMAND=ssh -o StrictHostKeyChecking=yes -o UserKnownHostsFile=${knownHosts}"]) {
                                 sh "find . -type d -exec chmod -s {} \\;"
                                 sh "find . -type d -exec chmod 0755 {} \\;"
                                 sh 'mkdir -p ~/.gnupg && chmod 700 ~/.gnupg'
                                 sh 'echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf'
                                 sh 'gpgconf --kill gpg-agent || true'
                                 sh 'gpg --batch --import "${KEYRING}"'
-                                sh 'for fpr in $(gpg --list-keys --with-colons  | awk -F: \'/fpr:/ {print $10}\' | sort -u); do echo -e "5\\ny\\n" |  gpg --batch --command-fd 0 --expert --edit-key ${fpr} trust; done'
+                                sh 'for fpr in $(gpg --list-keys --with-colons  | awk -F: \'/fpr:/ {print $10}\' | sort -u); do printf "5\\ny\\n" |  gpg --batch --command-fd 0 --expert --edit-key ${fpr} trust; done'
 
                                 sh 'git config --local user.name "crac-bot"'
                                 sh 'git config --local user.email "crac-bot@eclipse.org"'
@@ -166,7 +185,9 @@ pipeline {
                             exit 1
                         }
 
-                        mkdir -p release-assets
+                        # Start empty so a reused workspace cannot leak an earlier version's assets.
+                        rm -rf release-assets
+                        mkdir release-assets
                         cp spec/target/generated-docs/index.html "release-assets/jakarta-crac-${RELEASE_VERSION}.html"
                         cp spec/target/generated-docs/spec.pdf   "release-assets/jakarta-crac-${RELEASE_VERSION}.pdf"
                         cp "api/target/jakarta.crac-api-${RELEASE_VERSION}-javadoc.jar" \\

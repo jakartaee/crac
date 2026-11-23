@@ -96,4 +96,46 @@ Automatic-Module-Name: jakarta.crac
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- Javadoc fails on a package without types, but Maven Central requires a javadoc jar.
+             While there is no module-info.java (that is, until the first API type is added),
+             skip Javadoc and attach a placeholder javadoc jar instead. -->
+        <profile>
+            <id>placeholder-javadoc</id>
+            <activation>
+                <file>
+                    <missing>${basedir}/src/main/java/module-info.java</missing>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>placeholder-javadoc</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>javadoc</classifier>
+                                    <classesDirectory>${basedir}/src/main/javadoc-placeholder</classesDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

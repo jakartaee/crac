@@ -25,7 +25,7 @@ Java formatting is automated with Spotless (root pom) using palantir-java-format
 
 ### API module (`api/`)
 
-Defines the `jakarta.crac` package. It currently holds only `package-info.java`; the compiler runs with `-Xpkginfo:always` so the package exists in the jar. javac refuses to export an empty package, so there is no `module-info.java` yet and bnd sets `Automatic-Module-Name: jakarta.crac`. When the first type is added, add `module-info.java` (`module jakarta.crac { requires transitive jakarta.cdi; exports jakarta.crac; }`) and remove the `Automatic-Module-Name` line from `api/pom.xml`.
+Defines the `jakarta.crac` package. It currently holds only `package-info.java`; the compiler runs with `-Xpkginfo:always` so the package exists in the jar. javac refuses to export an empty package, so there is no `module-info.java` yet and bnd sets `Automatic-Module-Name: jakarta.crac`. When the first type is added, add `module-info.java` (`module jakarta.crac { requires transitive jakarta.cdi; exports jakarta.crac; }`) and remove the `Automatic-Module-Name` line from `api/pom.xml`. Javadoc also fails on a package without types, while Maven Central requires a javadoc jar, so the `placeholder-javadoc` profile in `api/pom.xml` skips Javadoc and attaches a jar holding `src/main/javadoc-placeholder/README.md` instead. The profile is active only while `module-info.java` is missing, so adding it switches real Javadoc back on; then delete the profile and the placeholder directory.
 
 ### Specification module (`spec/`)
 

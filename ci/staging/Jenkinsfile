@@ -123,6 +123,21 @@ github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+V
 
                                 sh "mvn clean versions:set -DnewVersion=${params.RELEASE_VERSION} -DgenerateBackupPoms=false"
 
+                                // Never move a published release tag: once a version may have been promoted to
+                                // Maven Central, the tag and the GitHub release must keep describing that build.
+                                // To retry only the GitHub release, restart the job from that stage instead.
+                                sh """
+                                    status=0
+                                    git ls-remote --exit-code --tags origin refs/tags/${params.RELEASE_VERSION} > /dev/null || status=\$?
+                                    if [ "\$status" -eq 0 ]; then
+                                        echo "Tag ${params.RELEASE_VERSION} already exists on origin; refusing to overwrite it. Use a new RELEASE_VERSION." >&2
+                                        exit 1
+                                    elif [ "\$status" -ne 2 ]; then
+                                        echo "Could not query tags on origin (exit \$status)." >&2
+                                        exit 1
+                                    fi
+                                """
+
                                 sh "git tag -d ${params.RELEASE_VERSION} 2>/dev/null || true"
                                 sh "git commit -a -m '[Jenkins staging job] Preparing release ${params.RELEASE_VERSION}'"
                                 sh "git tag -a -m 'Release ${params.RELEASE_VERSION}' ${params.RELEASE_VERSION}"
@@ -133,7 +148,7 @@ github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+V
 
                                 sh "git commit -a -m '[Jenkins staging job] Preparing next development iteration'"
                                 sh "git push origin HEAD:refs/heads/${targetBranch}"
-                                sh "git push --force origin refs/tags/${params.RELEASE_VERSION}"
+                                sh "git push origin refs/tags/${params.RELEASE_VERSION}"
                                 }
                             }
                         }

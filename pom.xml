@@ -48,7 +48,7 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git://github.com/jakartaee/crac.git</connection>
+        <connection>scm:git:https://github.com/jakartaee/crac.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jakartaee/crac.git</developerConnection>
         <url>https://github.com/jakartaee/crac</url>
     </scm>

@@ -28,6 +28,9 @@ pipeline {
     options {
         buildDiscarder logRotator(daysToKeepStr: '30', numToKeepStr: '10')
         disableConcurrentBuilds(abortPrevious: false)
+        // Keep the release stash so "Restart from Stage" can publish the GitHub release
+        // from the original build.
+        preserveStashes(buildCount: 5)
     }
     parameters {
         string(
@@ -143,6 +146,8 @@ github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+V
                                 sh "git tag -a -m 'Release ${params.RELEASE_VERSION}' ${params.RELEASE_VERSION}"
 
                                 sh "mvn clean deploy -Pstage-release -DskipTests=true -Dspec.status='${params.SPEC_STATUS}'"
+                                stash name: 'release-assets',
+                                        includes: "spec/target/generated-docs/index.html,spec/target/generated-docs/spec.pdf,api/target/jakarta.crac-api-${params.RELEASE_VERSION}-javadoc.jar"
 
                                 sh "mvn versions:set -DnewVersion=${params.DEVELOPMENT_VERSION} -DgenerateBackupPoms=false"
 
@@ -173,6 +178,9 @@ github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+V
                 PRERELEASE = "${params.SPEC_STATUS == 'Final Release' ? 'false' : 'true'}"
             }
             steps {
+                // The files built by the previous stage, also when restarting from this stage
+                // in a fresh workspace.
+                unstash 'release-assets'
                 withCredentials([string(credentialsId: 'github-bot-token', variable: 'GH_TOKEN')]) {
                     sh '''
                         # Note: no 'pipefail' below. Jenkins runs sh with /bin/sh,

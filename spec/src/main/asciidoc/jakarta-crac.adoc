@@ -1,0 +1,19 @@
+:crac-api-source-dir: ../../../../../api/src/main/java/
+
+include::chapters/intro.asciidoc[]
+
+include::chapters/concepts.asciidoc[]
+
+include::chapters/checkpoint.asciidoc[]
+
+include::chapters/lifecycle.asciidoc[]
+
+include::chapters/resources.asciidoc[]
+
+include::chapters/cdi.asciidoc[]
+
+include::chapters/integration.asciidoc[]
+
+include::chapters/revision.asciidoc[]
+
+include::chapters/refs.asciidoc[]

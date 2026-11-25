@@ -1,0 +1,31 @@
+[[resource-management]]
+== Resource Management
+
+NOTE: _To be written._ Introduce the resources that need to be managed at
+checkpoint and restore, such as open files, network connections, thread
+pools, and environment-specific configuration.
+
+[[runtime-resource-obligations]]
+=== Runtime Resource Obligations
+
+NOTE: _To be written._ Define the obligations of the application server
+towards the resources it manages, so that an image does not capture state
+that is invalid after restore.
+
+[[application-resources]]
+=== Application Resources
+
+NOTE: _To be written._ Define how applications make the runtime aware of the
+resources they manage and how the runtime notifies them.
+
+[[resource-configuration]]
+=== Configuration Changes on Restore
+
+NOTE: _To be written._ Define how configuration that differs between the
+checkpointed and the restored environment is handled.
+
+[[resource-security]]
+=== Security Considerations
+
+NOTE: _To be written._ Address secrets, credentials, and other sensitive
+state that may be captured in an image.

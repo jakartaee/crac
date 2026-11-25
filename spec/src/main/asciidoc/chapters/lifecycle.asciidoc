@@ -1,0 +1,36 @@
+[[checkpoint-restore-lifecycle]]
+== Checkpoint and Restore Lifecycle
+
+NOTE: _To be written._ Give an overview of the lifecycle of a runtime that is
+checkpointed and later restored.
+
+[[lifecycle-before-checkpoint]]
+=== Before Checkpoint
+
+NOTE: _To be written._ Define what the runtime and applications are notified
+of before a checkpoint is taken, and in which order.
+
+[[lifecycle-after-restore]]
+=== After Restore
+
+NOTE: _To be written._ Define what the runtime and applications are notified
+of after a restore, and in which order.
+
+[[lifecycle-ordering]]
+=== Ordering
+
+NOTE: _To be written._ Define the order in which runtime-managed and
+application-provided resources are notified, including the ordering
+between deployed applications.
+
+[[lifecycle-failures]]
+=== Failures
+
+NOTE: _To be written._ Define the behavior when a checkpoint or a restore
+fails or is vetoed, including how failures are reported.
+
+[[lifecycle-repeated]]
+=== Repeated Checkpoints
+
+NOTE: _To be written._ Define the behavior when a restored runtime is
+checkpointed again.

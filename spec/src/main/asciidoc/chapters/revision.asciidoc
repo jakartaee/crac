@@ -1,0 +1,7 @@
+[appendix]
+[[revision_history]]
+== Revision History
+
+=== 1.0
+
+Initial release of Jakarta CRaC.

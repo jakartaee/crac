@@ -1,0 +1,94 @@
+[[introduction]]
+== Introduction
+
+Jakarta CRaC (Coordinated Restore at Checkpoint) defines a standard behavior
+for Jakarta EE applications and runtimes for checkpoint and restore events.
+
+Checkpoint and restore mechanisms, such as those researched by the OpenJDK
+CRaC Project and provided by OpenJ9 CRIU support (InstantOn), make an image
+(snapshot) of a running Java instance and later start new instances from that
+image. Restoring from an image can address problems with the start-up and
+warm-up times of Java applications. Jakarta CRaC defines how a Jakarta EE
+runtime is made aware that a checkpoint is being taken and that it is being
+restored, and how application developers tell the runtime to handle the
+external resources used by the application.
+
+[[scope]]
+=== Scope
+
+* Defines how a Jakarta EE runtime is notified of checkpoint and restore
+  events.
+* Defines the obligations of a Jakarta EE runtime towards the resources it
+  manages when a checkpoint is taken and when the runtime is restored.
+* Defines how applications make the runtime aware of resources to manage at
+  checkpoint and restore events.
+* Defines both automatic checkpoints and manual checkpoints that are
+  triggered from outside the Java Virtual Machine.
+* Defines CDI events and annotations for checkpoint and restore events.
+
+NOTE: _To be written._ Describe the targeted Java SE and Jakarta EE versions,
+and whether the specification is standalone or intended for inclusion in a
+Jakarta EE profile.
+
+[[goals]]
+=== Goals
+
+The primary goals of Jakarta CRaC are:
+
+**Runtime notification**:: Provide a standard mechanism to notify Jakarta EE
+implementations about checkpoint and restore events.
+
+**Application resources**:: Provide a standard mechanism for Jakarta EE
+applications to make implementations aware of resources to manage at
+checkpoint and restore events.
+
+**Mechanism neutrality**:: Work seamlessly with CRaC and InstantOn.
+
+[[non-goals]]
+=== Non-goals
+
+The following are explicitly outside the scope of this specification:
+
+**Replacing the CRaC API**:: This specification does not seek to replace the
+existing CRaC API (`org.crac`).
+
+NOTE: _To be written._ List further non-goals, for example the checkpoint
+mechanism itself, image formats, and image storage.
+
+[[conventions]]
+=== Conventions
+
+The keywords "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in xref:ref-rfc2119[RFC 2119].
+
+[[terminology]]
+=== Terminology
+
+Checkpoint:: The act of making an image of a running Java instance.
+
+Restore:: The act of starting a Java instance from an image created by a
+checkpoint.
+
+Image:: The persisted state of a Java instance produced by a checkpoint.
+
+Runtime:: A Jakarta EE implementation, such as an application server, that
+implements this specification.
+
+NOTE: _To be written._ Complete the terminology, for example automatic and
+manual checkpoint, and resource.
+
+[[organization]]
+=== How this Specification is Organized
+
+- xref:concepts[Checkpoint and Restore Concepts] introduces the model.
+- xref:initiating-a-checkpoint[Initiating a Checkpoint] defines automatic and
+  manual checkpoints.
+- xref:checkpoint-restore-lifecycle[Checkpoint and Restore Lifecycle] defines
+  the order in which the runtime and applications are notified.
+- xref:resource-management[Resource Management] defines the obligations of
+  the runtime and the means for applications to register resources.
+- xref:cdi-integration[CDI Integration] defines the CDI events and
+  annotations.
+- xref:integration[Integration with Other Specifications] covers the
+  behavior of other Jakarta EE technologies at checkpoint and restore.

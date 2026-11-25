@@ -1,0 +1,25 @@
+[[concepts]]
+== Checkpoint and Restore Concepts
+
+NOTE: _To be written._ Give an overview of checkpoint and restore for Jakarta
+EE applications, and of the parties involved: the checkpoint mechanism, the
+runtime, and the application.
+
+[[concepts-checkpoint-mechanisms]]
+=== Checkpoint Mechanisms
+
+NOTE: _To be written._ Describe how the specification relates to the
+underlying checkpoint mechanisms, such as OpenJDK CRaC and OpenJ9 CRIU
+(InstantOn), without depending on any one of them.
+
+[[concepts-relationship-to-org-crac]]
+=== Relationship to the CRaC API
+
+NOTE: _To be written._ Describe how the specification relates to the
+existing `org.crac` API, which it does not replace.
+
+[[concepts-example]]
+=== Example
+
+NOTE: _To be written._ Show a complete, minimal example of an application
+that takes part in checkpoint and restore.
